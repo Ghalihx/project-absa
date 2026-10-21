@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2 style="margin:0 0 6px;">Evaluate (Pred vs Ground Truth)</h2>
+  <div class="small">Upload predictions.csv dan ground-truth CSV (kolom wajib: <code>review_id, aspect, sentiment</code>).</div>
+
+  <form action="{{ url_for('evaluate_post') }}" method="post" enctype="multipart/form-data" style="margin-top:12px;">
+    <div class="grid">
+      <div>
+        <label>Predictions CSV</label>
+        <input type="file" name="pred_file" accept=".csv" required>
+      </div>
+      <div>
+        <label>Ground Truth CSV</label>
+        <input type="file" name="gt_file" accept=".csv" required>
+      </div>
+    </div>
+    <div style="margin-top:12px;">
+      <button class="btn primary" type="submit">Run Evaluation</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title or "ABSA  XAI" }}</title>
+  <style>
+    :root { --bg:#fff; --fg:#111; --muted:#666; --border:#e6e6e6; --card:#fff; --accent:#0b5fff; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:var(--bg); color:var(--fg); }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 24px 16px 60px; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding: 8px 0 18px; border-bottom:1px solid var(--border); }
+    header .brand { font-weight:700; letter-spacing:.2px; }
+    header nav a { color:var(--fg); text-decoration:none; margin-left:12px; font-size:14px; }
+    header nav a:hover { text-decoration:underline; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; margin-top:16px; }
+    .grid { display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+    @media (max-width: 900px){ .grid{ grid-template-columns: 1fr; } }
+    .btn { display:inline-block; border:1px solid var(--border); background:#fff; padding:10px 12px; border-radius:10px; cursor:pointer; text-decoration:none; color:var(--fg); }
+    .btn.primary { border-color: var(--accent); color: var(--accent); }
+    .btn:hover { filter:brightness(.98); }
+    input[type=file], select { width:100%; padding:10px; border:1px solid var(--border); border-radius:10px; background:#fff; }
+    label { font-size: 13px; color: var(--muted); display:block; margin-bottom:6px; }
+    .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    .row > * { flex: 1; min-width: 180px; }
+    .small { font-size:12px; color: var(--muted); }
+    table { width:100%; border-collapse: collapse; }
+    th, td { border-bottom:1px solid var(--border); padding:8px 6px; text-align:left; font-size:13px; vertical-align:top; }
+    th { font-size:12px; color: var(--muted); text-transform: uppercase; letter-spacing:.04em; }
+    .flash { padding:10px 12px; border-radius:10px; margin-top:12px; border:1px solid var(--border); }
+    .flash.error { border-color: #ffd0d0; background:#fff7f7; }
+    .flash.success { border-color: #ccead6; background:#f6fffa; }
+    .pill { display:inline-block; padding:2px 8px; border:1px solid var(--border); border-radius:999px; font-size:12px; color:var(--muted); }
+    img { max-width:100%; border:1px solid var(--border); border-radius:12px; background:#fff; }
+    code { background:#f7f7f7; border:1px solid var(--border); padding:2px 6px; border-radius:8px; }
+    .footer { margin-top:24px; color:var(--muted); font-size:12px; }
+    .checkgrid { display:grid; grid-template-columns: repeat(4, minmax(160px, 1fr)); gap:10px; }
+    @media (max-width: 900px){ .checkgrid{ grid-template-columns: repeat(2, minmax(160px, 1fr)); } }
+    .check { display:flex; gap:8px; align-items:center; border:1px solid var(--border); border-radius:12px; padding:8px 10px; }
+  </style>
+<script>
+function copyText(id){
+  const el=document.getElementById(id);
+  if(!el) return;
+  const txt=el.value || el.textContent || '';
+  navigator.clipboard.writeText(txt);
+}
+function toggleShow(id){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.style.display = (el.style.display==='none' || el.style.display==='') ? 'block' : 'none';
+}
+</script>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">ABSA + XAI</div>
+      <nav>
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('evaluate_get') }}">Evaluate</a>
+        <a href="{{ url_for('evaluate_compare_get') }}">Evaluate Compare</a>
+      </nav>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for cat, msg in messages %}
+          <div class="flash {{ cat }}">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+
+    <div class="footer">
+    </div>
+  </div>
+</body>
+</html>

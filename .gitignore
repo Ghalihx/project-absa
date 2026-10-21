@@ -1,0 +1,25 @@
+# Python virtualenv
+.venv/
+venv/
+ENV/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Large installer executables
+*.exe
+
+# IDE configs
+.idea/
+.vscode/
+
+# Environment variables
+.env
+
+# Generated uploads and outputs (keep folders, ignore files)
+absa/absa/uploads/*
+!absa/absa/uploads/.gitkeep
+absa/absa/outputs/*
+!absa/absa/outputs/.gitkeep

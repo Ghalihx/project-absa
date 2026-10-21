@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2 style="margin:0 0 6px;">1) Upload CSV</h2>
+  <div class="small">Upload dataset CSV, pilih kolom teks, lalu jalankan preprocessing.</div>
+
+  <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data" style="margin-top:12px;">
+    <div class="row">
+      <div>
+        <label>CSV file</label>
+        <input type="file" name="csv_file" accept=".csv" required>
+      </div>
+      <div style="flex:0 0 auto; min-width:auto; align-self:end;">
+        <button class="btn primary" type="submit">Upload</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+{% if uploaded %}
+<div class="card">
+  <h2 style="margin:0 0 6px;">2) Preprocess</h2>
+  <div class="small">File: <b>{{ filename }}</b> &nbsp; <span class="pill">file_id: {{ file_id }}</span></div>
+
+  <form action="{{ url_for('process') }}" method="post" style="margin-top:12px;">
+    <input type="hidden" name="file_id" value="{{ file_id }}">
+    <input type="hidden" name="filename" value="{{ filename }}">
+
+    <div class="row">
+      <div>
+        <label>Text column</label>
+        <select name="text_col">
+          {% for c in columns %}
+            <option value="{{ c }}" {% if c==selected_col %}selected{% endif %}>{{ c }}</option>
+          {% endfor %}
+        </select>
+        {% if inferred_cols %}
+          <div class="small">Inferred: {{ inferred_cols|join(", ") }}</div>
+        {% endif %}
+      </div>
+      <div>
+        <label>Options</label>
+        <div class="checkgrid">
+          {% for k,v in opts.items() %}
+            <label class="check"><input type="checkbox" name="{{ k }}" {% if v %}checked{% endif %}> {{ k }}</label>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px;">
+      <button class="btn primary" type="submit">Run Preprocess</button>
+      {% if job_id %}
+        <span class="pill">job_id: {{ job_id }}</span>
+      {% endif %}
+    </div>
+  </form>
+
+  {% if preview_rows %}
+  <div style="margin-top:14px;">
+    <h3 style="margin:0 0 8px;">Preview (raw)</h3>
+    <div style="overflow:auto; border:1px solid var(--border); border-radius:12px;">
+      <table>
+        <thead>
+          <tr>
+            {% for c in columns[:8] %}<th>{{ c }}</th>{% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in preview_rows %}
+            <tr>
+              {% for c in columns[:8] %}<td>{{ r[c] }}</td>{% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if processed_preview %}
+  <div style="margin-top:16px;">
+    <h3 style="margin:0 0 8px;">Processed Preview (first 10 rows)</h3>
+    <div class="small">Use the copy buttons to copy prompts for quick testing in your LLM.</div>
+
+    <div style="overflow:auto; border:1px solid var(--border); border-radius:12px; margin-top:10px;">
+      <table>
+        <thead>
+          <tr>
+            <th>text_raw</th>
+            <th>text_clean_sw</th>
+            <th>language</th>
+            <th>is_relevant</th>
+            <th>prompt_zero_shot</th>
+            <th>prompt_few_shot</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in processed_preview %}
+            {% set zid = "pz_" ~ loop.index %}
+            {% set fid = "pf_" ~ loop.index %}
+            <tr>
+              <td style="min-width:240px;">{{ r.text_raw }}</td>
+              <td style="min-width:240px;">{{ r.text_clean_sw }}</td>
+              <td>{{ r.language }}</td>
+              <td>{{ r.is_relevant }}</td>
+              <td style="min-width:260px;">
+                <button class="btn" type="button" onclick="copyText('{{ zid }}')">Copy</button>
+                <button class="btn" type="button" onclick="toggleShow('{{ zid }}_box')">Show</button>
+                <textarea id="{{ zid }}" style="position:absolute; left:-9999px;">{{ r.prompt_zero_shot }}</textarea>
+                <pre id="{{ zid }}_box" style="display:none; white-space:pre-wrap; border:1px solid var(--border); border-radius:12px; padding:10px; margin-top:8px;">{{ r.prompt_zero_shot }}</pre>
+              </td>
+              <td style="min-width:260px;">
+                <button class="btn" type="button" onclick="copyText('{{ fid }}')">Copy</button>
+                <button class="btn" type="button" onclick="toggleShow('{{ fid }}_box')">Show</button>
+                <textarea id="{{ fid }}" style="position:absolute; left:-9999px;">{{ r.prompt_few_shot }}</textarea>
+                <pre id="{{ fid }}_box" style="display:none; white-space:pre-wrap; border:1px solid var(--border); border-radius:12px; padding:10px; margin-top:8px;">{{ r.prompt_few_shot }}</pre>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+{% if job_id %}
+<div class="card">
+  <h2 style="margin:0 0 6px;">3) Analyze (Zero-shot / Few-shot)</h2>
+  <div class="small">Jalankan Analyze untuk masing-masing skema. File CSV export otomatis dibedakan.</div>
+
+  <form action="{{ url_for('analyze') }}" method="post" style="margin-top:12px;">
+    <input type="hidden" name="job_id" value="{{ job_id }}">
+    <div class="row">
+      <div>
+        <label>Mode</label>
+        <select name="mode">
+          <option value="demo">LLM (no API)</option>
+          <option value="llm">LLM (needs OPENAI_API_KEY)</option>
+        </select>
+      </div>
+      <div>
+        <label>Prompt scheme</label>
+        <select name="scheme">
+          <option value="zero">zero-shot</option>
+          <option value="few">few-shot</option>
+        </select>
+      </div>
+      <div style="flex:0 0 auto; min-width:auto; align-self:end;">
+        <button class="btn primary" type="submit">Analyze</button>
+      </div>
+    </div>
+  </form>
+
+  <div style="margin-top:10px;" class="small">
+    Download:
+    <a href="{{ url_for('download_preprocessed', job_id=job_id) }}">preprocessed CSV</a>
+  </div>
+</div>
+{% endif %}
+
+{% if message %}
+<div class="card">
+  <b>Status:</b> {{ message }}
+</div>
+{% endif %}
+
+{% endif %}
+{% endblock %}

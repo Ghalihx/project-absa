@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2 style="margin:0 0 6px;">Evaluation Result</h2>
+  <div class="small">Rows evaluated: {{ report.rows }}</div>
+
+  <div class="grid" style="margin-top:12px;">
+    <div class="card">
+      <h3 style="margin:0 0 8px;">Overall</h3>
+      <table>
+        <tbody>
+          <tr><th>accuracy</th><td>{{ report.overall.accuracy }}</td></tr>
+          <tr><th>macro_precision</th><td>{{ report.overall.macro_precision }}</td></tr>
+          <tr><th>macro_recall</th><td>{{ report.overall.macro_recall }}</td></tr>
+          <tr><th>macro_f1</th><td>{{ report.overall.macro_f1 }}</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3 style="margin:0 0 8px;">Confusion Matrix (Sentiment)</h3>
+      <img src="{{ report.cm_sentiment_url }}" alt="CM sentiment">
+      {% if report.cm_pair_url %}
+        <div class="small" style="margin-top:10px;">CM (Aspect|Sentiment):</div>
+        <img src="{{ report.cm_pair_url }}" alt="CM pair">
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin:0 0 8px;">Per-class (Aspect|Sentiment)</h3>
+    <div style="overflow:auto; max-height:520px;">
+      <table>
+        <thead><tr><th>label</th><th>precision</th><th>recall</th><th>f1</th><th>support</th></tr></thead>
+        <tbody>
+          {% for r in report.per_class %}
+            <tr><td>{{ r.label }}</td><td>{{ r.precision }}</td><td>{{ r.recall }}</td><td>{{ r.f1 }}</td><td>{{ r.support }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

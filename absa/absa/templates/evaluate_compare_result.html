@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2 style="margin:0 0 6px;">Compare Result</h2>
+  <div class="small">Confusion Matrix 3×3 + XAI keyword contributions untuk masing-masing skema.</div>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h3 style="margin:0 0 8px;">Confusion Matrix: Zero-Shot</h3>
+    <img src="{{ cm_zero_url }}" alt="CM zero">
+  </div>
+  <div class="card">
+    <h3 style="margin:0 0 8px;">Confusion Matrix: Few-Shot</h3>
+    <img src="{{ cm_few_url }}" alt="CM few">
+  </div>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h3 style="margin:0 0 8px;">XAI Keywords: Zero-Shot</h3>
+    <img src="{{ xai_zero_url }}" alt="XAI zero">
+  </div>
+  <div class="card">
+    <h3 style="margin:0 0 8px;">XAI Keywords: Few-Shot</h3>
+    <img src="{{ xai_few_url }}" alt="XAI few">
+  </div>
+</div>
+
+<div class="card">
+  <a class="btn" href="{{ url_for('evaluate_compare_get') }}">Back</a>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+review_id,aspect,sentiment
+1,cleanliness,positive
+1,accessibility/parking,negative
+2,environment/sea quality,positive
+2,facilities,negative
+3,price/value,positive
+3,environment/sea quality,positive
+4,environment/sea quality,positive
+4,cleanliness,negative
+5,service,positive
+5,facilities,positive
+6,accessibility/parking,negative
+7,environment/sea quality,positive
+8,crowding,negative
+9,price/value,negative
+9,environment/sea quality,positive
+10,facilities,negative

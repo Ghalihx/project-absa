@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2 style="margin:0 0 6px;">Results</h2>
+  <div class="small">
+    <span class="pill">job_id: {{ job_id }}</span>
+    <span class="pill">scheme: {{ scheme }}</span>
+  </div>
+
+  <div style="margin-top:12px;" class="row">
+    <a class="btn {% if scheme=='zero' %}primary{% endif %}" href="{{ url_for('results', job_id=job_id, scheme='zero') }}">View Zero-shot</a>
+    <a class="btn {% if scheme=='few' %}primary{% endif %}" href="{{ url_for('results', job_id=job_id, scheme='few') }}">View Few-shot</a>
+    <a class="btn" href="{{ url_for('download_predictions', job_id=job_id, scheme=scheme) }}">Download predictions ({{ scheme }})</a>
+    <a class="btn" href="{{ url_for('download_preprocessed', job_id=job_id) }}">Download preprocessed</a>
+  </div>
+
+  {% if xai_url %}
+    <div style="margin-top:14px;">
+      <h3 style="margin:0 0 8px;">XAI: Key Word Contributions Across All Sentiments</h3>
+      <img src="{{ xai_url }}" alt="XAI keywords plot">
+    </div>
+  {% else %}
+    <div class="small" style="margin-top:10px;">XAI plot belum tersedia.</div>
+  {% endif %}
+
+  <div style="margin-top:16px;">
+    <h3 style="margin:0 0 8px;">Confusion Matrix (Overall 3×3)</h3>
+    <div class="small">Klik tombol di bawah untuk generate confusion matrix (butuh ground truth overall CSV: <code>review_id, overall</code>).</div>
+
+    <form action="{{ url_for('make_confusion', job_id=job_id) }}" method="post" enctype="multipart/form-data" style="margin-top:10px;">
+      <input type="hidden" name="scheme" value="{{ scheme }}">
+      <div class="row">
+        <div>
+          <label>Ground truth overall CSV</label>
+          <input type="file" name="gt_overall" accept=".csv" required>
+        </div>
+        <div style="flex:0 0 auto; min-width:auto; align-self:end;">
+          <button class="btn primary" type="submit">Generate Confusion Matrix</button>
+        </div>
+      </div>
+    </form>
+
+    {% if cm_url %}
+      <div style="margin-top:10px;">
+        <img src="{{ cm_url }}" alt="Confusion Matrix">
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h3 style="margin:0 0 8px;">Aspect × Sentiment summary</h3>
+    <div style="overflow:auto;">
+      <table>
+        <thead><tr><th>Aspect</th><th>Sentiment</th><th>Count</th></tr></thead>
+        <tbody>
+          {% for s in summary %}
+            <tr><td>{{ s.aspect }}</td><td>{{ s.sentiment }}</td><td>{{ s.count }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin:0 0 8px;">Predictions preview (first 200 rows)</h3>
+    <div style="overflow:auto; max-height:520px;">
+      <table>
+        <thead>
+          <tr>
+            <th>review_id</th><th>aspect</th><th>sentiment</th><th>evidence</th><th>confidence</th><th>explanation</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rows %}
+            <tr>
+              <td>{{ r.review_id }}</td>
+              <td>{{ r.aspect }}</td>
+              <td>{{ r.sentiment }}</td>
+              <td>{{ r.evidence }}</td>
+              <td>{{ r.confidence }}</td>
+              <td>{{ r.explanation }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

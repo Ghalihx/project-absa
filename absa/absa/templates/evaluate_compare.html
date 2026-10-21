@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2 style="margin:0 0 6px;">Evaluate Compare (Zero-shot vs Few-shot)</h2>
+  <div class="small">
+    Upload 3 file:
+    <ul>
+      <li><b>predictions zero-shot</b> (CSV hasil Analyze zero-shot)</li>
+      <li><b>predictions few-shot</b> (CSV hasil Analyze few-shot)</li>
+      <li><b>ground truth overall</b> (CSV kolom: <code>review_id, overall</code> dengan nilai Negative/Neutral/Positive)</li>
+    </ul>
+  </div>
+
+  <form action="{{ url_for('evaluate_compare_post') }}" method="post" enctype="multipart/form-data">
+    <div class="grid">
+      <div>
+        <label>Predictions Zero-shot CSV</label>
+        <input type="file" name="pred_zero" accept=".csv" required>
+      </div>
+      <div>
+        <label>Predictions Few-shot CSV</label>
+        <input type="file" name="pred_few" accept=".csv" required>
+      </div>
+    </div>
+    <div style="margin-top:12px;">
+      <label>Ground Truth Overall CSV</label>
+      <input type="file" name="gt_file" accept=".csv" required>
+    </div>
+
+    <div style="margin-top:12px;">
+      <button class="btn primary" type="submit">Run Compare</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
