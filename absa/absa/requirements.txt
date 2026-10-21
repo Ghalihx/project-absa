@@ -8,3 +8,4 @@ regex==2024.7.24
 langdetect==1.0.9
 scikit-learn==1.5.1
 matplotlib==3.9.2
+gunicorn==22.0.0
